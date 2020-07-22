@@ -170,6 +170,7 @@ function getMouseCanvasPos(event) {
 
 // Touchstart event handler
 $canvas.on("touchstart", function(e) {
+  e.preventDefault();
   activatePen();
   ctx.beginPath();
   let pos = getTouchCanvasPos(e);
@@ -185,6 +186,7 @@ $canvas.on("touchstart", function(e) {
 // Touchmove event handler
 $canvas.on("touchmove", function(e) {
   if (activePen.pressed) {
+    e.preventDefault();
     let pos = getTouchCanvasPos(e);
     let x = pos[0];
     let y = pos[1];
@@ -197,6 +199,7 @@ $canvas.on("touchmove", function(e) {
 
 // Touchend event handler
 $canvas.on("touchend", function(e) {
+  e.preventDefault();
   deactivatePen();
 
   console.log("Mouseup at " + getMouseCanvasPos(e));
