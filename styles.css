@@ -1,0 +1,77 @@
+body {
+  background-color: #eeeeee;
+  font-family: sans-serif;
+}
+
+/* Containers */
+.content-outer {
+  width: 100%;
+  height: 100vh;
+  padding: 80px 120px;
+}
+
+.content-inner {
+  width: 100%;
+  height: 100%;
+}
+
+.box {
+  background-color: #fff;
+  border: 1px solid black;
+}
+
+.canvas-container {
+  display: none;
+  /* display: flex after window load */
+  min-width: 100;
+  min-height: 100;
+  position: relative;
+}
+
+/* Toolkit */
+.toolkit {
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px 0;
+  position: absolute;
+  left: -80px;
+}
+
+.toolkit-item {
+  display: block;
+  padding: 12px;
+  font-size: 30px;
+}
+
+.toolkit-item:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.inactive {
+  color: rgb(0, 0, 0);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.blue-pen {
+  color: rgb(0, 0, 255);
+}
+
+.blue-pen.inactive {
+  color: rgb(0, 0, 255);
+  color: rgba(0, 0, 255, 0.5);
+}
+
+.red-pen {
+  color: rgb(255, 0, 0);
+}
+
+.red-pen.inactive {
+  color: rgb(255, 0, 0);
+  color: rgba(255, 0, 0, 0.5);
+}
+
+canvas {
+
+  /* cursor: url("icons\\outline_panorama_fish_eye_black_18dp_2x.png") 16 16, default; */
+}
