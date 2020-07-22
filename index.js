@@ -24,7 +24,6 @@ const activePen = {
 
 // Event listener for window load
 $(window).on("load", function() {
-  window.scrollTo(0,1);
   setCanvasDims();
   $(".canvas-container").css("display", "flex");
 });
@@ -204,6 +203,12 @@ $canvas.on("touchend", function(e) {
   deactivatePen();
 
   console.log("Mouseup at " + getMouseCanvasPos(e));
+});
+
+// Scroll down to remove address bar and go full screen on mobile
+$(".box").on("touchstart", function(e){
+  window.scrollTo(0,1);
+  if (debug) console.log("Mobile focus on box");
 });
 
 // Gets the position of touch from event
