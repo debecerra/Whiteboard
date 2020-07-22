@@ -24,6 +24,7 @@ const activePen = {
 
 // Event listener for window load
 $(window).on("load", function() {
+  window.scrollTo(0,1);
   setCanvasDims();
   $(".canvas-container").css("display", "flex");
 });
