@@ -4,18 +4,46 @@
  Globals and Constants
  *************************/
 
-const debug = true;
+const debug = false;
 
-let $canvas = $("#canvas");
-let canvas = $canvas.get(0);
+let canvas = $("#canvas").get(0);
 let ctx = canvas.getContext("2d");
 
-const activePen = {
+const penColors = {
+  BLACK: "#000",
+  RED: "#f00",
+  BLUE: "#00f"
+};
+Object.freeze(penColors);
+
+const toolModes = {
+  DRAW: 0,
+  ERASE: 1
+};
+Object.freeze(toolModes);
+
+const cursors = {
+  DEFAULT: "default-cursor",
+  ERASE: "erase-cursor"
+};
+Object.freeze(cursors);
+
+const pen = {
+  width: 2,
+  cursor: cursors.DEFAULT,
+  color: penColors.BLACK
+};
+
+const eraser = {
+  width: 24,
+  cursor: cursors.ERASE
+};
+
+
+const activeTool = {
   pressed: false,
-  color: "#000",
-  lineWidth: 3,
-  cursor: "default", // cursor: url("icons\\outline_panorama_fish_eye_black_18dp.png") 16 16, default;
-  isEraser: false
+  mode: toolModes.DRAW,
+  tool: pen,
 };
 
 /*************************
@@ -122,32 +150,46 @@ function updateCanvasDims() {
  *************************/
 
 // Mousedown event handler
-$canvas.on("mousedown", function(e) {
-  activatePen();
-  ctx.beginPath();
+$(canvas).on("mousedown", function(e) {
   let pos = getMouseCanvasPos(e);
   let x = pos[0];
   let y = pos[1];
-  ctx.rect(x, y, 1, 1);
-  ctx.moveTo(x, y);
-  ctx.stroke();
+
+  if (activeTool.mode === toolModes.DRAW) {
+    activatePen();
+    ctx.beginPath();
+    ctx.rect(x, y, 1, 1);
+    ctx.moveTo(x, y);
+    ctx.stroke();
+  } else if (activeTool.mode === toolModes.ERASE) {
+    activeTool.pressed = true;
+    ctx.clearRect(x - (activeTool.tool.width / 2), y - (activeTool.tool.width / 2), activeTool.tool.width, activeTool.tool.width);
+  }
 
   if (debug) console.log("Mousedown:", pos);
 });
 
 // Mousemove event handler
-$canvas.on("mousemove", function(e) {
-  if (activePen.pressed) {
+$(canvas).on("mousemove", function(e) {
+  if (activeTool.pressed) {
     let pos = getMouseCanvasPos(e);
     let x = pos[0];
     let y = pos[1];
-    ctx.lineTo(x, y);
-    ctx.stroke();
+    if (activeTool.mode === toolModes.DRAW) {
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    } else if (activeTool.mode === toolModes.ERASE) {
+      ctx.clearRect(x - (activeTool.tool.width / 2), y - (activeTool.tool.width / 2), activeTool.tool.width, activeTool.tool.width);
+    }
+
+    if (debug) console.log("Mousemove:", pos);
   }
+
+
 });
 
 //Mouseup event handler
-$canvas.on("mouseup", function(e) {
+$(canvas).on("mouseup", function(e) {
   deactivatePen();
 
   if (debug) console.log("Mouseup:", getMouseCanvasPos(e));
@@ -169,7 +211,7 @@ function getMouseCanvasPos(event) {
 // TODO: test on a mobile device
 
 // Touchstart event handler
-$canvas.on("touchstart", function(e) {
+$(canvas).on("touchstart", function(e) {
   e.preventDefault();
   activatePen();
   ctx.beginPath();
@@ -180,12 +222,12 @@ $canvas.on("touchstart", function(e) {
   ctx.moveTo(x, y);
   ctx.stroke();
 
-  if (debug) console.log("Touchstart:",  pos);
+  if (debug) console.log("Touchstart:", pos);
 });
 
 // Touchmove event handler
-$canvas.on("touchmove", function(e) {
-  if (activePen.pressed) {
+$(canvas).on("touchmove", function(e) {
+  if (activeTool.pressed) {
     e.preventDefault();
     let pos = getTouchCanvasPos(e);
     let x = pos[0];
@@ -193,12 +235,12 @@ $canvas.on("touchmove", function(e) {
     ctx.lineTo(x, y);
     ctx.stroke();
 
-    if (debug) console.log("Touchmove:",  pos);
+    if (debug) console.log("Touchmove:", pos);
   }
 });
 
 // Touchend event handler
-$canvas.on("touchend", function(e) {
+$(canvas).on("touchend", function(e) {
   e.preventDefault();
   deactivatePen();
 
@@ -206,8 +248,8 @@ $canvas.on("touchend", function(e) {
 });
 
 // Scroll down to remove address bar and go full screen on mobile
-$(".box").on("touchstart", function(e){
-  window.scrollTo(0,1);
+$(".box").on("touchstart", function(e) {
+  window.scrollTo(0, 1);
   if (debug) console.log("Mobile focus on box");
 });
 
@@ -226,14 +268,14 @@ function getTouchCanvasPos(event) {
 
 // Updates state pf globals to begin drawing
 function activatePen() {
-  activePen.pressed = true;
-  ctx.lineWidth = activePen.lineWidth;
-  ctx.strokeStyle = activePen.color;
+  activeTool.pressed = true;
+  ctx.lineWidth = activeTool.tool.width;
+  ctx.strokeStyle = activeTool.tool.color;
 }
 
 // Updates state pf globals to end drawing
 function deactivatePen() {
-  activePen.pressed = false;
+  activeTool.pressed = false;
 }
 
 
@@ -252,21 +294,16 @@ $(".toolkit-item.tool").on("click", function(e) {
 
   switch (elementID) {
     case "black-pen":
-      activePen.color = "#000";
-      activePen.lineWidth = 3;
+      setToolToPen(penColors.BLACK);
       break;
     case "red-pen":
-      activePen.color = "#f00";
-      activePen.lineWidth = 3;
+      setToolToPen(penColors.RED);
       break;
     case "blue-pen":
-      activePen.color = "#00f";
-      activePen.lineWidth = 3;
+      setToolToPen(penColors.BLUE);
       break;
     case "eraser":
-      // TODO: Custom cursor state when erasing
-      activePen.color = "#fff";
-      activePen.lineWidth = 20;
+      setToolToEraser();
       break;
     default:
   }
@@ -277,3 +314,24 @@ $(".toolkit-item.tool").on("click", function(e) {
 $(".delete").on("click", function(e) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
+
+function setToolToPen(color) {
+  $(canvas).removeClass(activeTool.tool.cursor);
+
+  activeTool.mode = toolModes.DRAW;
+  activeTool.tool = pen;
+  activeTool.tool.color = color;
+  $(canvas).addClass(activeTool.tool.cursor);
+
+  if (debug) console.log("Tool change to:", activeTool);
+}
+
+function setToolToEraser() {
+  $(canvas).removeClass(activeTool.tool.cursor);
+
+  activeTool.mode = toolModes.ERASE;
+  activeTool.tool = eraser;
+  $(canvas).addClass(activeTool.tool.cursor);
+
+  if (debug) console.log("Tool change to:", activeTool);
+}

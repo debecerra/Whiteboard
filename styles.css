@@ -7,7 +7,7 @@ body {
 .content-outer {
   width: 100%;
   height: 100vh;
-  padding: 80px 120px;
+  padding: 5% 65px;
 }
 
 .content-inner {
@@ -34,13 +34,13 @@ body {
   text-align: center;
   padding: 10px 0;
   position: absolute;
-  left: -80px;
+  left: -60px;
 }
 
 .toolkit-item {
   display: block;
   padding: 12px;
-  font-size: 30px;
+  font-size: 24px;
 }
 
 .toolkit-item:hover {
@@ -71,7 +71,12 @@ body {
   color: rgba(255, 0, 0, 0.5);
 }
 
-canvas {
+/* Cursors */
 
-  /* cursor: url("icons\\outline_panorama_fish_eye_black_18dp_2x.png") 16 16, default; */
+.default-cursor {
+  cursor: default;
+}
+
+.erase-cursor {
+  cursor: url("icons\\outline_crop_square_black_36dp.png") 18 18, default;
 }
