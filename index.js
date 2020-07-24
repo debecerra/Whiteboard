@@ -1,13 +1,17 @@
 //jshint esversion:6
 
 /*************************
- Globals and Constants
+ Globals
  *************************/
 
-const debug = false;
+const debug = true;
 
 let canvas = $("#canvas").get(0);
 let ctx = canvas.getContext("2d");
+
+/*************************
+ Enums
+ *************************/
 
 const penColors = {
   BLACK: "#000",
@@ -28,6 +32,10 @@ const cursors = {
 };
 Object.freeze(cursors);
 
+/*************************
+ Globals that represent different tools
+ *************************/
+
 const pen = {
   width: 2,
   cursor: cursors.DEFAULT,
@@ -38,7 +46,6 @@ const eraser = {
   width: 24,
   cursor: cursors.ERASE
 };
-
 
 const activeTool = {
   pressed: false,
@@ -91,7 +98,7 @@ function computeCanvasDims() {
     newHeight = maxHeight;
   }
 
-  // Log messages for debugging
+  // Debug logging
   if (debug) console.log("Content area: " + [newWidth, newHeight]);
   if (debug) console.log("Old canvas width:", canvas.width);
   if (debug) console.log("New canvas width:", newWidth);
@@ -150,31 +157,102 @@ function updateCanvasDims() {
  *************************/
 
 // Mousedown event handler
-$(canvas).on("mousedown", function(e) {
-  let pos = getMouseCanvasPos(e);
+$(canvas).on("mousedown", drawStart);
+
+// Mousemove event handler
+$(canvas).on("mousemove", drawMove);
+
+//Mouseup event handler
+$(canvas).on("mouseup", drawEnd);
+
+/*************************
+ Canvas-related Touch Event Handlers
+*************************/
+
+// Touchstart event handler
+$(canvas).on("touchstart", drawStart);
+
+// Touchmove event handler
+$(canvas).on("touchmove", drawMove);
+
+// Touchend event handler
+$(canvas).on("touchend", drawEnd);
+
+// TODO: fix this
+
+// // Scroll down to remove address bar and go full screen on mobile
+// $(".box").on("click", function(e) {
+//   document.body.requestFullscreen();
+//   if (debug) console.log("requested fullscreen on touchstart");
+// });
+
+/*************************
+ Drawing Helper Functions
+*************************/
+
+// Gets the canvas position coordinates of a mouse or touch event
+function getCanvasPos(e) {
+  let offsetLeft = canvas.getBoundingClientRect().left;
+  let offsetTop = canvas.getBoundingClientRect().top;
+  let x, y;
+
+  if (e.type.match(/^mouse/)) {
+    x = event.pageX - offsetLeft;
+    y = event.pageY - offsetTop;
+  } else if (e.type.match(/^touch/)) {
+    x = event.touches[0].pageX - offsetLeft;
+    y = event.touches[0].pageY - offsetTop;
+  }
+
+  return [x, y];
+}
+
+// Activates the current tool and begins drawing state
+function drawStart(e) {
+  // Get the event position
+  let pos = getCanvasPos(e);
   let x = pos[0];
   let y = pos[1];
 
+  // Activate the current tool
+  activeTool.pressed = true;
+
+  // Prevent default scroll behaviour if touch
+  if (e.type.match(/^touch/)) {
+    e.preventDefault();
+  }
+
+  // Use the active tool
   if (activeTool.mode === toolModes.DRAW) {
-    activatePen();
+    ctx.lineWidth = activeTool.tool.width;
+    ctx.strokeStyle = activeTool.tool.color;
     ctx.beginPath();
     ctx.rect(x, y, 1, 1);
     ctx.moveTo(x, y);
     ctx.stroke();
   } else if (activeTool.mode === toolModes.ERASE) {
-    activeTool.pressed = true;
     ctx.clearRect(x - (activeTool.tool.width / 2), y - (activeTool.tool.width / 2), activeTool.tool.width, activeTool.tool.width);
   }
 
-  if (debug) console.log("Mousedown:", pos);
-});
+  // Debug logging
+  if (debug) console.log(e.type + ":", pos);
+}
 
-// Mousemove event handler
-$(canvas).on("mousemove", function(e) {
+// Uses the current whiteboard tool at current position
+function drawMove(e) {
   if (activeTool.pressed) {
-    let pos = getMouseCanvasPos(e);
+
+    // Prevent default scroll behaviour if touch
+    if (e.type.match(/^touch/)) {
+      e.preventDefault();
+    }
+
+    // Get the event position
+    let pos = getCanvasPos(e);
     let x = pos[0];
     let y = pos[1];
+
+    // Use the active tool
     if (activeTool.mode === toolModes.DRAW) {
       ctx.lineTo(x, y);
       ctx.stroke();
@@ -182,102 +260,24 @@ $(canvas).on("mousemove", function(e) {
       ctx.clearRect(x - (activeTool.tool.width / 2), y - (activeTool.tool.width / 2), activeTool.tool.width, activeTool.tool.width);
     }
 
-    if (debug) console.log("Mousemove:", pos);
+    // Debug logging
+    if (debug) console.log(e.type + ":", pos);
   }
-
-
-});
-
-//Mouseup event handler
-$(canvas).on("mouseup", function(e) {
-  deactivatePen();
-
-  if (debug) console.log("Mouseup:", getMouseCanvasPos(e));
-});
-
-// Gets the position of mouse from event
-function getMouseCanvasPos(event) {
-  let offsetLeft = canvas.getBoundingClientRect().left;
-  let offsetTop = canvas.getBoundingClientRect().top;
-  x = event.pageX - offsetLeft;
-  y = event.pageY - offsetTop;
-  return [x, y];
 }
 
-/*************************
- Canvas-related Touch Event Handlers
-*************************/
-
-// TODO: test on a mobile device
-
-// Touchstart event handler
-$(canvas).on("touchstart", function(e) {
-  e.preventDefault();
-  activatePen();
-  ctx.beginPath();
-  let pos = getTouchCanvasPos(e);
-  let x = pos[0];
-  let y = pos[1];
-  ctx.rect(x, y, 1, 1);
-  ctx.moveTo(x, y);
-  ctx.stroke();
-
-  if (debug) console.log("Touchstart:", pos);
-});
-
-// Touchmove event handler
-$(canvas).on("touchmove", function(e) {
-  if (activeTool.pressed) {
+// Disactivates the current tool and ends drawing state
+function drawEnd(e) {
+  // Prevent default scroll behaviour if touch
+  if (e.type.match(/^touch/)) {
     e.preventDefault();
-    let pos = getTouchCanvasPos(e);
-    let x = pos[0];
-    let y = pos[1];
-    ctx.lineTo(x, y);
-    ctx.stroke();
-
-    if (debug) console.log("Touchmove:", pos);
   }
-});
 
-// Touchend event handler
-$(canvas).on("touchend", function(e) {
-  e.preventDefault();
-  deactivatePen();
-
-  console.log("Mouseup at " + getMouseCanvasPos(e));
-});
-
-// Scroll down to remove address bar and go full screen on mobile
-$(".box").on("touchstart", function(e) {
-  window.scrollTo(0, 1);
-  if (debug) console.log("Mobile focus on box");
-});
-
-// Gets the position of touch from event
-function getTouchCanvasPos(event) {
-  let offsetLeft = canvas.getBoundingClientRect().left;
-  let offsetTop = canvas.getBoundingClientRect().top;
-  x = event.touches[0].pageX - offsetLeft;
-  y = event.touches[0].pageY - offsetTop;
-  return [x, y];
-}
-
-/*************************
- Drawing Helper Functions
-*************************/
-
-// Updates state pf globals to begin drawing
-function activatePen() {
-  activeTool.pressed = true;
-  ctx.lineWidth = activeTool.tool.width;
-  ctx.strokeStyle = activeTool.tool.color;
-}
-
-// Updates state pf globals to end drawing
-function deactivatePen() {
+  // Deactivate the current tool
   activeTool.pressed = false;
-}
 
+  // Debug logging
+  if (debug) console.log(e.type + ":", getCanvasPos(e));
+}
 
 /*************************
  Toolkit Event Handlers
@@ -315,23 +315,31 @@ $(".delete").on("click", function(e) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
 
+// Sets the active tool to the drawing pen tool
 function setToolToPen(color) {
+  // Remove cursor associated with current active tool
   $(canvas).removeClass(activeTool.tool.cursor);
 
+  // Change active tool to pen
   activeTool.mode = toolModes.DRAW;
   activeTool.tool = pen;
   activeTool.tool.color = color;
   $(canvas).addClass(activeTool.tool.cursor);
 
+  // Debug logging
   if (debug) console.log("Tool change to:", activeTool);
 }
 
+// Sets the active tool to the eraser tool
 function setToolToEraser() {
+  // Remove cursor associated with current active tool
   $(canvas).removeClass(activeTool.tool.cursor);
 
+  // Change active tool to eraser
   activeTool.mode = toolModes.ERASE;
   activeTool.tool = eraser;
   $(canvas).addClass(activeTool.tool.cursor);
 
+  // Debug logging
   if (debug) console.log("Tool change to:", activeTool);
 }
