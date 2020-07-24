@@ -180,11 +180,11 @@ $(canvas).on("touchend", drawEnd);
 
 // TODO: fix this
 
-// // Scroll down to remove address bar and go full screen on mobile
-// $(".box").on("click", function(e) {
-//   document.body.requestFullscreen();
-//   if (debug) console.log("requested fullscreen on touchstart");
-// });
+// Scroll down to remove address bar and go full screen on mobile
+$(".content-outer").on("touchstart", function(e) {
+  document.body.requestFullscreen();
+  if (debug) console.log("requested fullscreen on touchstart");
+});
 
 /*************************
  Drawing Helper Functions
