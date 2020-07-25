@@ -37,13 +37,20 @@ html, body {
   left: -60px;
 }
 
-.toolkit-item {
-  display: block;
-  padding: 12px;
-  font-size: 24px;
+.options {
+  text-align: center;
+  padding: 10px 0;
+  position: absolute;
+  right: -60px;
 }
 
-.toolkit-item:hover {
+.menu-item {
+  display: block;
+  padding: 10px;
+  font-size: 1.7rem;
+}
+
+.menu-item:hover {
   background-color: #f5f5f5;
   cursor: pointer;
 }
@@ -79,4 +86,14 @@ html, body {
 
 .erase-cursor {
   cursor: url("icons\\outline_crop_square_black_36dp.png") 18 18, default;
+}
+
+/* Disabled Features */
+.disable {
+  color: rgb(0, 0, 0);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.disable:hover {
+  background-color: #fff;
 }

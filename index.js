@@ -284,10 +284,11 @@ function drawEnd(e) {
 *************************/
 
 // Click event handler for tool items
-$(".toolkit-item.tool").on("click", function(e) {
+$(".menu-item.tool").on("click", function(e) {
   // Update active toolkit item
-  $(".toolkit-item.tool").addClass("inactive");
+  $(".menu-item.tool").addClass("inactive");
   $(this).removeClass("inactive");
+  console.log("something");
 
   // Perform action based on id of selected item
   let elementID = $(this).attr("id");

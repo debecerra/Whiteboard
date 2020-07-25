@@ -31,19 +31,23 @@
       <div class="canvas-container align-items-center">
 
         <div id="toolkit" class="box toolkit">
-          <i id="black-pen" class="material-icons toolkit-item tool black-pen">create</i>
-          <i id="red-pen" class="material-icons toolkit-item tool red-pen inactive">create</i>
-          <i id="blue-pen" class="material-icons toolkit-item tool blue-pen inactive">create</i>
-          <i id="eraser" class="material-icons toolkit-item tool eraser inactive">crop_square</i>
-          <i id="delete" class="material-icons toolkit-item delete">delete</i>
+          <i id="black-pen" class="material-icons menu-item tool black-pen" title="Black">create</i>
+          <i id="red-pen" class="material-icons menu-item tool red-pen inactive" title="Red">create</i>
+          <i id="blue-pen" class="material-icons menu-item tool blue-pen inactive" title="Blue">create</i>
+          <i id="eraser" class="material-icons menu-item tool eraser inactive" title="Eraser">crop_square</i>
+          <i id="delete" class="material-icons menu-item delete" title="Delete All">delete</i>
         </div>
 
         <canvas id="canvas" class="box default-cursor">
           Sorry, your browser does not support the HTML canvas.
         </canvas>
 
-        <div id="options">
-
+        <div id="options" class="box options">
+          <i id="undo" class="material-icons menu-item disable" title="Undo">undo</i>
+          <i id="redo" class="material-icons menu-item disable" title="Redo">redo</i>
+          <i id="fullscreen" class="material-icons menu-item disable" title="Fullscreen" >fullscreen</i>
+          <i id="download" class="material-icons menu-item disable" title="Download">get_app</i>
+          <i id="share" class="material-icons menu-item disable" title="Share" >share</i>
         </div>
 
       </div>
