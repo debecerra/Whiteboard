@@ -9,6 +9,8 @@ const debug = true;
 let canvas = $("#canvas").get(0);
 let ctx = canvas.getContext("2d");
 
+let resizeTimeoutID = null;
+
 /*************************
  Enums
  *************************/
@@ -59,20 +61,48 @@ const activeTool = {
 
 // Event listener for window load
 $(window).on("load", function() {
-  setCanvasDims();
+  // Get the canvas dimensions for viewport
+  let dimensions = computeCanvasDims();
+  let width = dimensions[0];
+  let height = dimensions[1];
+
+  // Set the canvas position
+  setCanvasDims(width, height);
+
+  // Show the canvas once size has been set
   $(".canvas-container").css("display", "flex");
 });
 
-// OPTIMIZE:
-// Make it so we only update canvas dimensions when there is a
-// change to be made
+// TODO/OPTIMIZE:
+// Make it so canvas doesn't resize so goddamn much
 
 // Event listener for window resize
 $(window).on("resize", function() {
-  updateCanvasDims();
+  // Get new possible canvas dimensions
+  let dimensions = computeCanvasDims();
+  let newWidth = dimensions[0];
+  let newHeight = dimensions[1];
 
-  setTimeout(function() {
-    updateCanvasDims();
+  // If new dimensions differ from current, update the canvas
+  if (newWidth != canvas.width || newHeight != canvas.height) {
+    updateCanvasDims(newWidth, newHeight);
+  }
+
+  // Clear timer set by setTimeout method below
+  clearTimeout(resizeTimeoutID);
+
+  // Set delay to update canvas dimensions again once resizing has stopped for
+  // 300 milliseconds. This is to ensure an update occurs when the window
+  // reaches it's final resize position and the mouse/touch stays calibrated
+  resizeTimeoutID = setTimeout(function() {
+    // Get new possible canvas dimensions
+    let dimensions = computeCanvasDims();
+    let newWidth = dimensions[0];
+    let newHeight = dimensions[1];
+
+    // Update canvas dimensions (always))
+    updateCanvasDims(newWidth, newHeight);
+    if (debug) console.log("Final resize complete");
 
   }, 300);
 
@@ -99,38 +129,26 @@ function computeCanvasDims() {
   }
 
   // Debug logging
-  if (debug) console.log("Content area: " + [newWidth, newHeight]);
-  if (debug) console.log("Old canvas width:", canvas.width);
-  if (debug) console.log("New canvas width:", newWidth);
-  if (debug) console.log("Old canvas height:", canvas.height);
-  if (debug) console.log("New canvas height:", maxHeight);
+  if (debug) console.log("Content area:", maxWidth, maxHeight);
+  if (debug) console.log("Old dimensions:", canvas.width, canvas.height);
+  if (debug) console.log("New dimensions:", newWidth, newHeight);
 
   return [newWidth, newHeight];
 }
 
 // Set the initial canvas dimensions
-function setCanvasDims() {
-  // Get dimenions for canvas based off viewport
-  let dimensions = computeCanvasDims();
-  let newWidth = dimensions[0];
-  let newHeight = dimensions[1];
-
+function setCanvasDims(width, height) {
   // Set width and height of canvas
-  canvas.width = newWidth;
-  canvas.height = newHeight;
+  canvas.width = width;
+  canvas.height = height;
 
   // Log mesages for debugging
-  if (debug) console.log("Canvas set to: " + newWidth, newHeight);
+  if (debug) console.log("Canvas set to:", width, height);
 
 }
 
 // Update the canvas dimensions
-function updateCanvasDims() {
-  // Get dimenions for canvas based off viewport
-  let dimensions = computeCanvasDims();
-  let newWidth = dimensions[0];
-  let newHeight = dimensions[1];
-
+function updateCanvasDims(newWidth, newHeight) {
   // Copy image data from canvas to a new canvas
   var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   var newCanvas = $("<canvas>")
@@ -150,6 +168,8 @@ function updateCanvasDims() {
   // Rescale and redraw canvas
   ctx.scale(xScale, yScale);
   ctx.drawImage(newCanvas, 0, 0);
+
+  if (debug) console.log("Canvas dimensions updated");
 }
 
 /*************************
