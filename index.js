@@ -108,8 +108,6 @@ $(window).on("resize", function() {
 
 });
 
-// TODO: Handle edge case of canvas that is too small
-
 // Compute the largest possible canvas size
 function computeCanvasDims() {
   // Get the max possible width and height for canvas
