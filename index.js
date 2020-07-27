@@ -330,9 +330,13 @@ $(".menu-item.tool").on("click", function(e) {
 });
 
 // Click event handler for delete tool item
-$(".delete").on("click", function(e) {
+$("#delete").on("click", function(e) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
+
+/*************************
+ Toolkit Helper Functions
+*************************/
 
 // Sets the active tool to the drawing pen tool
 function setToolToPen(color) {
@@ -361,4 +365,39 @@ function setToolToEraser() {
 
   // Debug logging
   if (debug) console.log("Tool change to:", activeTool);
+}
+
+/*************************
+ Options Event Handlers
+*************************/
+
+$("#fullscreen").on("click", function(e) {
+  toggleFullscreen();
+});
+
+// Toggle between fullscreen and window views
+function toggleFullscreen() {
+  var doc = window.document;
+  var docEl = doc.documentElement;
+
+  // Get the vendor prefix requestFullScreen method depending on browser
+  var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+
+  // Get the vendor prefix exitFullscreen method depending on browser
+  var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+  if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+    // If FullScreenElement is null for every vendor prefix, request FullScreen for the correct vendor prefix
+    requestFullScreen.call(docEl);
+
+    // Change fullscreen icon to fullscreen_exit
+    $("#fullscreen").html("fullscreen_exit");
+  } else {
+    // If FullScreenElement is not null for some vendor prefix, exit FullScreen for that vendor prefix
+    cancelFullScreen.call(doc);
+
+    // Change fullscreen_exit icon to fullscreen
+    $("#fullscreen").html("fullscreen");
+
+  }
 }
