@@ -46,7 +46,8 @@ const pen = {
 
 const eraser = {
   width: 24,
-  cursor: cursors.ERASE
+  cursor: cursors.ERASE,
+  color: "#fff"
 };
 
 const activeTool = {
@@ -371,8 +372,14 @@ function setToolToEraser() {
  Options Event Handlers
 *************************/
 
+// Click event handler for fullscreen option item
 $("#fullscreen").on("click", function(e) {
   toggleFullscreen();
+});
+
+// Click event handler for fullscreen option item
+$("#download").on("click", function(e) {
+  downloadCanvasImage();
 });
 
 // Toggle between fullscreen and window views
@@ -400,4 +407,24 @@ function toggleFullscreen() {
     $("#fullscreen").html("fullscreen");
 
   }
+}
+
+// Downloads the canvas drawing
+function downloadCanvasImage() {
+  // Draw white background behind drawing before exporting image
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.fillStyle = eraser.color;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Change globalCompositeOperation back to default;
+  ctx.globalCompositeOperation = "source-over";
+
+  // Get reference to anchor and image
+  let link = document.getElementById("downloadAnchor");
+  let img = canvas.toDataURL();
+
+  // Set the image download for the anchor tag and download the image
+  $(link).attr("href", img);
+  link.click();
+
 }

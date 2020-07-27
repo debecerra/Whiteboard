@@ -98,4 +98,5 @@ html, body {
 
 .disable:hover {
   background-color: #fff;
+  cursor: default;
 }
