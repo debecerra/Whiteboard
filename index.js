@@ -399,6 +399,9 @@ function toggleFullscreen() {
 
     // Change fullscreen icon to fullscreen_exit
     $("#fullscreen").html("fullscreen_exit");
+
+    // Debug logging
+    if (debug) console.log("Fullscreen requested");
   } else {
     // If FullScreenElement is not null for some vendor prefix, exit FullScreen for that vendor prefix
     cancelFullScreen.call(doc);
@@ -406,6 +409,8 @@ function toggleFullscreen() {
     // Change fullscreen_exit icon to fullscreen
     $("#fullscreen").html("fullscreen");
 
+    // Debug logging
+    if (debug) console.log("Fullscreen exited");
   }
 }
 
@@ -427,4 +432,6 @@ function downloadCanvasImage() {
   $(link).attr("href", img);
   link.click();
 
+  // Debug logging
+  if (debug) console.log("Image downloaded");
 }
