@@ -57,6 +57,16 @@ html, body {
   cursor: pointer;
 }
 
+.menu-item::selection {
+    color: none;
+    background: none;
+}
+/* For Mozilla Firefox */
+.menu-item::-moz-selection {
+    color: none;
+    background: none;
+}
+
 .inactive {
   color: rgb(0, 0, 0);
   color: rgba(0, 0, 0, 0.5);
@@ -81,7 +91,6 @@ html, body {
 }
 
 /* Cursors */
-
 .default-cursor {
   cursor: default;
 }
