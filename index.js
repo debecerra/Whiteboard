@@ -207,14 +207,6 @@ $(canvas).on("touchmove", drawMove);
 // Touchend event handler
 $(canvas).on("touchend", drawEnd);
 
-// TODO: fix this
-
-// Scroll down to remove address bar and go full screen on mobile
-// $(".content-outer").on("touchstart", function(e) {
-//   document.body.requestFullscreen();
-//   if (debug) console.log("requested fullscreen on touchstart");
-// });
-
 /*************************
  Drawing Helper Functions
 *************************/
@@ -246,11 +238,6 @@ function drawStart(e) {
   // Activate the current tool
   activeTool.pressed = true;
 
-  // Prevent default scroll behaviour if touch
-  // if (e.type.match(/^touch/)) {
-  //   e.preventDefault();
-  // }
-
   // Use the active tool
   if (activeTool.mode === toolModes.DRAW) {
     ctx.lineWidth = activeTool.tool.width;
@@ -270,12 +257,6 @@ function drawStart(e) {
 // Uses the current whiteboard tool at current position
 function drawMove(e) {
   if (activeTool.pressed) {
-
-    // Prevent default scroll behaviour if touch
-    // if (e.type.match(/^touch/)) {
-    //   e.preventDefault();
-    // }
-
     // Get the event position
     let pos = getCanvasPos(e);
     let x = pos[0];
@@ -296,11 +277,6 @@ function drawMove(e) {
 
 // Disactivates the current tool and ends drawing state
 function drawEnd(e) {
-  // Prevent default scroll behaviour if touch
-  // if (e.type.match(/^touch/)) {
-  //   e.preventDefault();
-  // }
-
   // Deactivate the current tool
   activeTool.pressed = false;
 
@@ -558,9 +534,10 @@ function popUndoCanvas() {
   ctx.scale(xScale, yScale);
   ctx.drawImage(newCanvas, 0, 0);
 
+  // Makes sure ctx resizes properly next time
   updateCanvasDims(ctx.canvas.width, ctx.canvas.height);
 
-  activeCanvas = getCurrentCanvas();
+  activeCanvas = newCanvas;
 
   if (debug) console.log("undoStack:", undoStack);
   console.log("Current Canvas", ctx.canvas.width, ctx.canvas.height);
@@ -583,6 +560,7 @@ function popRedoCanvas() {
   ctx.scale(xScale, yScale);
   ctx.drawImage(newCanvas, 0, 0);
 
+  // Makes sure ctx resizes properly next time
   updateCanvasDims(ctx.canvas.width, ctx.canvas.height);
 
   activeCanvas = newCanvas;
