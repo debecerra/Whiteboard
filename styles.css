@@ -30,6 +30,10 @@ html, body {
   position: relative;
 }
 
+canvas {
+  touch-action: none;
+}
+
 /* Toolkit */
 .toolkit {
   border-radius: 10px;

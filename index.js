@@ -221,8 +221,8 @@ $(canvas).on("touchend", drawEnd);
 
 // Gets the canvas position coordinates of a mouse or touch event
 function getCanvasPos(e) {
-  let offsetLeft = canvas.getBoundingClientRect().left;
-  let offsetTop = canvas.getBoundingClientRect().top;
+  let offsetLeft = $(".canvas-container")[0].offsetLeft;
+  let offsetTop = $(".canvas-container")[0].offsetTop;
   let x, y;
 
   if (e.type.match(/^mouse/)) {
@@ -247,9 +247,9 @@ function drawStart(e) {
   activeTool.pressed = true;
 
   // Prevent default scroll behaviour if touch
-  if (e.type.match(/^touch/)) {
-    e.preventDefault();
-  }
+  // if (e.type.match(/^touch/)) {
+  //   e.preventDefault();
+  // }
 
   // Use the active tool
   if (activeTool.mode === toolModes.DRAW) {
@@ -272,9 +272,9 @@ function drawMove(e) {
   if (activeTool.pressed) {
 
     // Prevent default scroll behaviour if touch
-    if (e.type.match(/^touch/)) {
-      e.preventDefault();
-    }
+    // if (e.type.match(/^touch/)) {
+    //   e.preventDefault();
+    // }
 
     // Get the event position
     let pos = getCanvasPos(e);
@@ -297,9 +297,9 @@ function drawMove(e) {
 // Disactivates the current tool and ends drawing state
 function drawEnd(e) {
   // Prevent default scroll behaviour if touch
-  if (e.type.match(/^touch/)) {
-    e.preventDefault();
-  }
+  // if (e.type.match(/^touch/)) {
+  //   e.preventDefault();
+  // }
 
   // Deactivate the current tool
   activeTool.pressed = false;
@@ -575,7 +575,7 @@ function popRedoCanvas() {
   if (debug) console.log("Canvas popped from undoStack");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
+
   let xScale = ctx.canvas.width / newCanvas.width;
   let yScale = ctx.canvas.height / newCanvas.height;
 
