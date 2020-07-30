@@ -6,9 +6,16 @@
 
 const debug = true;
 
-let canvas = $("#canvas").get(0);
+// Canvas variables
+let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
+// Undo and redo stacks
+const undoStack = [];
+const redoStack = [];
+let activeCanvas;
+
+// Resize timeout ID
 let resizeTimeoutID = null;
 
 /*************************
@@ -72,6 +79,9 @@ $(window).on("load", function() {
 
   // Show the canvas once size has been set
   $(".canvas-container").css("display", "flex");
+
+  // Set current canvas to activeCanvas
+  activeCanvas = getCurrentCanvas();
 });
 
 // TODO/OPTIMIZE:
@@ -294,8 +304,14 @@ function drawEnd(e) {
   // Deactivate the current tool
   activeTool.pressed = false;
 
+  // Copy current canvas and add to undoStack
+  addCurrentCanvasToUndo();
+  activeCanvas = getCurrentCanvas();
+  clearRedoStack();
+
   // Debug logging
   if (debug) console.log(e.type + ":", getCanvasPos(e));
+  if (debug) console.log("undoStack:", undoStack);
 }
 
 /*************************
@@ -333,6 +349,11 @@ $(".menu-item.tool").on("click", function(e) {
 // Click event handler for delete tool item
 $("#delete").on("click", function(e) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Copy current canvas and add to undoStack
+  addCurrentCanvasToUndo();
+  activeCanvas = getCurrentCanvas();
+  clearRedoStack();
 });
 
 /*************************
@@ -372,6 +393,30 @@ function setToolToEraser() {
  Options Event Handlers
 *************************/
 
+// Click event handler for undo option item
+$("#undo").on("click", function(e) {
+  if (undoStack.length > 0) {
+    addCurrentCanvasToRedo();
+    popUndoCanvas();
+
+    if (undoStack.length === 0) {
+      $("#undo").addClass("disable");
+    }
+  }
+});
+
+// Click event handler for redo option item
+$("#redo").on("click", function(e) {
+  if (redoStack.length > 0) {
+    addCurrentCanvasToUndo();
+    popRedoCanvas();
+
+    if (redoStack.length === 0) {
+      $("#redo").addClass("disable");
+    }
+  }
+});
+
 // Click event handler for fullscreen option item
 $("#fullscreen").on("click", function(e) {
   toggleFullscreen();
@@ -381,6 +426,11 @@ $("#fullscreen").on("click", function(e) {
 $("#download").on("click", function(e) {
   downloadCanvasImage();
 });
+
+
+/*************************
+ Helper functions for options
+*************************/
 
 // Toggle between fullscreen and window views
 function toggleFullscreen() {
@@ -434,4 +484,108 @@ function downloadCanvasImage() {
 
   // Debug logging
   if (debug) console.log("Image downloaded");
+}
+
+/*************************
+ Undo and Redo functions
+*************************/
+
+// Pushes the current canvas into the Undo stack
+function addCurrentCanvasToUndo() {
+  // Add copy of active canvas to undoStack
+  if (activeCanvas != null) {
+    undoStack.push(activeCanvas);
+  }
+
+  // Enable "Undo" option
+  if ($("#undo").hasClass("disable")) {
+    $("#undo").removeClass("disable");
+  }
+
+  // Debug logging
+  if (debug) console.log("Canvas pushed into undoStack");
+}
+
+// Pushes the current canvas into the Redo stack
+function addCurrentCanvasToRedo() {
+  // Add copy of active canvas to redoStack
+  if (activeCanvas != null) {
+    redoStack.push(activeCanvas);
+  }
+
+  // Enable "Redo" option
+  if ($("#redo").hasClass("disable")) {
+    $("#redo").removeClass("disable");
+  }
+
+  // Debug logging
+  if (debug) console.log("Canvas pushed into redoStack");
+}
+
+// Creates a copy of the current canvas and returns that copy
+function getCurrentCanvas() {
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  var newCanvas = $("<canvas>")
+    .attr("width", imageData.width)
+    .attr("height", imageData.height)[0];
+
+  newCanvas.getContext("2d").putImageData(imageData, 0, 0);
+
+  return newCanvas;
+}
+
+// Clear the redoStack and disable the redo option
+function clearRedoStack() {
+  while (redoStack.length > 0) {
+    redoStack.pop();
+  }
+  $("#redo").addClass("disable");
+}
+
+// Pops canvas from undoStack and sets it to active canvas
+function popUndoCanvas() {
+  // Pop the top element in undoStack
+  let newCanvas = undoStack.pop();
+
+  if (debug) console.log("Canvas popped from undoStack");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let xScale = ctx.canvas.width / newCanvas.width;
+  let yScale = ctx.canvas.height / newCanvas.height;
+
+  // Rescale context and draw canvas
+  ctx.scale(xScale, yScale);
+  ctx.drawImage(newCanvas, 0, 0);
+
+  updateCanvasDims(ctx.canvas.width, ctx.canvas.height);
+
+  activeCanvas = getCurrentCanvas();
+
+  if (debug) console.log("undoStack:", undoStack);
+  console.log("Current Canvas", ctx.canvas.width, ctx.canvas.height);
+  console.log("Undo Canvas", newCanvas.width, newCanvas.height);
+}
+
+// Pops canvas from redoStack and sets it to active canvas
+function popRedoCanvas() {
+  // Pop the top element in undoStack
+  let newCanvas = redoStack.pop();
+
+  if (debug) console.log("Canvas popped from undoStack");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  let xScale = ctx.canvas.width / newCanvas.width;
+  let yScale = ctx.canvas.height / newCanvas.height;
+
+  // Rescale context and draw canvas
+  ctx.scale(xScale, yScale);
+  ctx.drawImage(newCanvas, 0, 0);
+
+  updateCanvasDims(ctx.canvas.width, ctx.canvas.height);
+
+  activeCanvas = newCanvas;
+
+  if (debug) console.log("undoStack:", undoStack);
 }
