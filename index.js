@@ -115,19 +115,24 @@ $(window).on("resize", function() {
     updateCanvasDims(newWidth, newHeight);
 
     // Redraw active canvas with less resize blur
-    // Clear the current canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setTimeout(function() {
+      // Clear the current canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Get the resize scale: activeCanvas -> canvas
-    let xScale = canvas.width / activeCanvas.width;
-    let yScale = canvas.height / activeCanvas.height;
+      // Get the resize scale: activeCanvas -> canvas
+      let xScale = canvas.width / activeCanvas.width;
+      let yScale = canvas.height / activeCanvas.height;
 
-    // Rescale context and draw canvas
-    ctx.scale(xScale, yScale);
-    ctx.drawImage(activeCanvas, 0, 0);
+      // Rescale context and draw canvas
+      ctx.scale(xScale, yScale);
+      ctx.drawImage(activeCanvas, 0, 0);
 
-    // Makes sure ctx resizes properly next time
-    updateCanvasDims(canvas.width, canvas.height);
+      // Makes sure ctx resizes properly next time
+      updateCanvasDims(canvas.width, canvas.height);
+
+      if (debug) console.log("Image redrawn");
+    }, 100);
+
     if (debug) console.log("Final resize complete");
 
   }, 300);
