@@ -81,7 +81,7 @@ $(window).on("load", function() {
   $(".canvas-container").css("display", "flex");
 
   // Set current canvas to activeCanvas
-  activeCanvas = getCurrentCanvas();
+  activeCanvas = getCurrentCanvasCopy();
 });
 
 // TODO/OPTIMIZE:
@@ -111,8 +111,23 @@ $(window).on("resize", function() {
     let newWidth = dimensions[0];
     let newHeight = dimensions[1];
 
-    // Update canvas dimensions (always))
+    // Update canvas dimensions (always)
     updateCanvasDims(newWidth, newHeight);
+
+    // Redraw active canvas with less resize blur
+    // Clear the current canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Get the resize scale: activeCanvas -> canvas
+    let xScale = canvas.width / activeCanvas.width;
+    let yScale = canvas.height / activeCanvas.height;
+
+    // Rescale context and draw canvas
+    ctx.scale(xScale, yScale);
+    ctx.drawImage(activeCanvas, 0, 0);
+
+    // Makes sure ctx resizes properly next time
+    updateCanvasDims(canvas.width, canvas.height);
     if (debug) console.log("Final resize complete");
 
   }, 300);
@@ -159,20 +174,15 @@ function setCanvasDims(width, height) {
 // Update the canvas dimensions
 function updateCanvasDims(newWidth, newHeight) {
   // Copy image data from canvas to a new canvas
-  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  var newCanvas = $("<canvas>")
-    .attr("width", imageData.width)
-    .attr("height", imageData.height)[0];
-
-  newCanvas.getContext("2d").putImageData(imageData, 0, 0);
+  let newCanvas = getCurrentCanvasCopy();
 
   // Compute scale ratio
-  let xScale = newWidth / ctx.canvas.width;
-  let yScale = newHeight / ctx.canvas.height;
+  let xScale = newWidth / canvas.width;
+  let yScale = newHeight / canvas.height;
 
   // Set new width and height to canvas
-  ctx.canvas.width = newWidth;
-  ctx.canvas.height = newHeight;
+  canvas.width = newWidth;
+  canvas.height = newHeight;
 
   // Rescale and redraw canvas
   ctx.scale(xScale, yScale);
@@ -282,7 +292,7 @@ function drawEnd(e) {
 
   // Copy current canvas and add to undoStack
   addCurrentCanvasToUndo();
-  activeCanvas = getCurrentCanvas();
+  activeCanvas = getCurrentCanvasCopy();
   clearRedoStack();
 
   // Debug logging
@@ -328,7 +338,7 @@ $("#delete").on("click", function(e) {
 
   // Copy current canvas and add to undoStack
   addCurrentCanvasToUndo();
-  activeCanvas = getCurrentCanvas();
+  activeCanvas = getCurrentCanvasCopy();
   clearRedoStack();
 });
 
@@ -499,7 +509,7 @@ function addCurrentCanvasToRedo() {
 }
 
 // Creates a copy of the current canvas and returns that copy
-function getCurrentCanvas() {
+function getCurrentCanvasCopy() {
   var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   var newCanvas = $("<canvas>")
     .attr("width", imageData.width)
@@ -527,15 +537,15 @@ function popUndoCanvas() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let xScale = ctx.canvas.width / newCanvas.width;
-  let yScale = ctx.canvas.height / newCanvas.height;
+  let xScale = canvas.width / newCanvas.width;
+  let yScale = canvas.height / newCanvas.height;
 
   // Rescale context and draw canvas
   ctx.scale(xScale, yScale);
   ctx.drawImage(newCanvas, 0, 0);
 
   // Makes sure ctx resizes properly next time
-  updateCanvasDims(ctx.canvas.width, ctx.canvas.height);
+  updateCanvasDims(canvas.width, canvas.height);
 
   activeCanvas = newCanvas;
 
@@ -553,15 +563,15 @@ function popRedoCanvas() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let xScale = ctx.canvas.width / newCanvas.width;
-  let yScale = ctx.canvas.height / newCanvas.height;
+  let xScale = canvas.width / newCanvas.width;
+  let yScale = canvas.height / newCanvas.height;
 
   // Rescale context and draw canvas
   ctx.scale(xScale, yScale);
   ctx.drawImage(newCanvas, 0, 0);
 
   // Makes sure ctx resizes properly next time
-  updateCanvasDims(ctx.canvas.width, ctx.canvas.height);
+  updateCanvasDims(canvas.width, canvas.height);
 
   activeCanvas = newCanvas;
 
