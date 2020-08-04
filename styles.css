@@ -61,16 +61,6 @@ canvas {
   cursor: pointer;
 }
 
-.menu-item::selection {
-    color: none;
-    background: none;
-}
-/* For Mozilla Firefox */
-.menu-item::-moz-selection {
-    color: none;
-    background: none;
-}
-
 .inactive {
   color: rgb(0, 0, 0);
   color: rgba(0, 0, 0, 0.5);
@@ -92,6 +82,23 @@ canvas {
 .red-pen.inactive {
   color: rgb(255, 0, 0);
   color: rgba(255, 0, 0, 0.5);
+}
+
+.disable-select::selection {
+  color: none;
+  background: none;
+}
+
+/* For Mozilla Firefox */
+.disable-select::-moz-selection {
+    color: none;
+    background: none;
+}
+
+/* For Webkit */
+.disable-select::-webkit-selection {
+    color: none;
+    background: none;
 }
 
 /* Cursors */

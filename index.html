@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" shrink-to-fit="no">
 
   <!-- TODO: replace this with Web App Manifest https://developers.google.com/web/fundamentals/native-hardware/fullscreen/#web_app_manifest_chrome_opera_firefox_samsung -->
   <!-- Mobile Fullscreen Meta Tags -->
@@ -31,22 +31,22 @@
       <div class="canvas-container align-items-center">
 
         <div id="toolkit" class="box toolkit">
-          <i id="black-pen" class="material-icons menu-item tool black-pen" title="Black">create</i>
-          <i id="red-pen" class="material-icons menu-item tool red-pen inactive" title="Red">create</i>
-          <i id="blue-pen" class="material-icons menu-item tool blue-pen inactive" title="Blue">create</i>
-          <i id="eraser" class="material-icons menu-item tool eraser inactive" title="Eraser">crop_square</i>
-          <i id="delete" class="material-icons menu-item delete" title="Delete All">delete</i>
+          <i id="black-pen" class="material-icons menu-item disable-select tool black-pen" title="Black">create</i>
+          <i id="red-pen" class="material-icons menu-item disable-select tool red-pen inactive" title="Red">create</i>
+          <i id="blue-pen" class="material-icons menu-item disable-select tool blue-pen inactive" title="Blue">create</i>
+          <i id="eraser" class="material-icons menu-item disable-select tool eraser inactive" title="Eraser">crop_square</i>
+          <i id="delete" class="material-icons menu-item disable-select delete" title="Delete All">delete</i>
         </div>
 
-        <canvas id="canvas" class="box default-cursor">
+        <canvas id="canvas" class="box default-cursor disable-select">
           Sorry, your browser does not support the HTML canvas.
         </canvas>
 
         <div id="options" class="box options">
-          <i id="undo" class="material-icons menu-item disable" title="Undo">undo</i>
-          <i id="redo" class="material-icons menu-item disable" title="Redo">redo</i>
-          <i id="fullscreen" class="material-icons menu-item" title="Fullscreen" >fullscreen</i>
-          <i id="download" class="material-icons menu-item" title="Download"><a id="downloadAnchor" download="myDrawing.png" ></a>get_app</i>
+          <i id="undo" class="material-icons menu-item disable-select disable" title="Undo">undo</i>
+          <i id="redo" class="material-icons menu-item disable-select disable" title="Redo">redo</i>
+          <i id="fullscreen" class="material-icons menu-item disable-select" title="Fullscreen" >fullscreen</i>
+          <i id="download" class="material-icons menu-item disable-select" title="Download"><a id="downloadAnchor" download="myDrawing.png" ></a>get_app</i>
         </div>
 
       </div>
