@@ -84,21 +84,32 @@ canvas {
   color: rgba(255, 0, 0, 0.5);
 }
 
-.disable-select::selection {
+/* .disable-select::selection {
   color: none;
   background: none;
-}
-
+} */
 /* For Mozilla Firefox */
-.disable-select::-moz-selection {
+/* .disable-select::-moz-selection {
     color: none;
     background: none;
-}
-
+} */
 /* For Webkit */
-.disable-select::-webkit-selection {
+/* .disable-select::-webkit-selection {
     color: none;
     background: none;
+} */
+.disable-select {
+  /* Chrome and Opera */
+  user-select: none;
+  /* Safari */
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  /* Konqueror HTML */
+  -khtml-user-select: none;
+  /* Firefox */
+  -moz-user-select: none;
+  /* Internet Explorer/Edge */
+  -ms-user-select: none;
 }
 
 /* Cursors */
