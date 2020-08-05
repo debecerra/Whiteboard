@@ -84,20 +84,6 @@ canvas {
   color: rgba(255, 0, 0, 0.5);
 }
 
-/* .disable-select::selection {
-  color: none;
-  background: none;
-} */
-/* For Mozilla Firefox */
-/* .disable-select::-moz-selection {
-    color: none;
-    background: none;
-} */
-/* For Webkit */
-/* .disable-select::-webkit-selection {
-    color: none;
-    background: none;
-} */
 .disable-select {
   /* Chrome and Opera */
   user-select: none;
